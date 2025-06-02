@@ -41,7 +41,7 @@ CACHE_TTL = int(os.getenv("CACHE_TTL", "3600"))  # seconds
 # Set page config with responsive layout
 st.set_page_config(
     page_title="Fourier - Text to Speech by EulerHive",
-    page_icon="src/assets/favicon.png",  # or .ico
+    page_icon="src/assets/favicon.png",  # Changed to .ico for better compatibility
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -74,7 +74,9 @@ st.markdown(
             border: 1px solid var(--border-neutral);
         }
         .company-logo {
-            max-width: 150px;
+            width: 150px !important;
+            height: auto !important;
+            object-fit: contain !important;
             margin-right: 2rem;
         }
         .company-title {

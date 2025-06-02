@@ -1,6 +1,10 @@
-"""Language code to name mapping for the Text to Speech Generator app."""
+"""Configuration settings for the Text to Speech Generator app."""
 
-# Language code to name mapping
+# Audio configuration
+AUDIO_ENCODING = "MP3"
+DEFAULT_SPEED = 1.0
+
+# Language and Voice Settings
 LANGUAGE_NAMES = {
     "ar-XA": "Arabic, multi-region",
     "id-ID": "Bahasa Indonesia (Indonesia)",
