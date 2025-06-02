@@ -386,6 +386,10 @@ def main():
         user_id = get_user_id()
         client = get_text_to_speech_client(user_id)
 
+        # Initialize history in session state if not exists
+        if "history" not in st.session_state:
+            st.session_state.history = []
+
         # Service Account Management Section
         st.sidebar.title("🔑 Service Account Setup")
 
@@ -460,6 +464,17 @@ def main():
                 audio_content = generate_speech(client, text, selected_voice_name, selected_language, speed)
 
                 if audio_content:
+                    # Add to history
+                    history_entry = {
+                        "text": text,
+                        "language": selected_language_name,
+                        "voice": selected_voice,
+                        "speed": speed,
+                        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+                        "audio_content": audio_content,
+                    }
+                    st.session_state.history.insert(0, history_entry)  # Add to beginning of list
+
                     # Create a temporary file to store the audio
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_file:
                         temp_file.write(audio_content)
@@ -483,6 +498,40 @@ def main():
                             os.unlink(temp_file_path)
                         except Exception as e:
                             logger.error(f"Error cleaning up temporary file: {str(e)}")
+
+        # Display History Section
+        if st.session_state.history:
+            st.markdown("---")
+            st.markdown("### 📜 Generation History")
+
+            for idx, entry in enumerate(st.session_state.history):
+                with st.expander(f"{entry['timestamp']} - {entry['language']} - {entry['voice']}"):
+                    st.text_area("Text", entry["text"], height=100, key=f"history_text_{idx}", disabled=True)
+                    st.write(f"Speed: {entry['speed']}x")
+
+                    # Create a temporary file for the audio
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_file:
+                        temp_file.write(entry["audio_content"])
+                        temp_file_path = temp_file.name
+
+                    try:
+                        st.audio(temp_file_path)
+                        st.download_button(
+                            label="Download Audio",
+                            data=entry["audio_content"],
+                            file_name=f"generated_speech_{idx}.mp3",
+                            mime="audio/mp3",
+                            key=f"history_download_{idx}",
+                        )
+                    finally:
+                        try:
+                            os.unlink(temp_file_path)
+                        except Exception as e:
+                            logger.error(f"Error cleaning up temporary file: {str(e)}")
+
+                    if st.button("Delete Entry", key=f"delete_{idx}"):
+                        st.session_state.history.pop(idx)
+                        st.rerun()
 
     except Exception as e:
         logger.error(f"Application error: {str(e)}")
