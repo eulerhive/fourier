@@ -41,9 +41,14 @@ CACHE_TTL = int(os.getenv("CACHE_TTL", "3600"))  # seconds
 # Set page config with responsive layout
 st.set_page_config(
     page_title="Fourier - Text to Speech by EulerHive",
-    page_icon="src/assets/favicon.png",  # Changed to .ico for better compatibility
+    page_icon="src/assets/favicon.ico",  # Changed to .ico for better compatibility
     layout="wide",
     initial_sidebar_state="expanded",
+    menu_items={
+        "Get Help": "https://github.com/EulerHive/Fourier",
+        "Report a bug": "https://github.com/EulerHive/Fourier/issues",
+        "About": "Fourier - Text to Speech Generator by EulerHive",
+    },
 )
 
 # Add custom CSS for better mobile responsiveness and company branding
@@ -398,7 +403,7 @@ def main():
             if uploaded_file is not None:
                 if save_service_account(user_id, uploaded_file):
                     st.sidebar.success("✅ Service account uploaded successfully!")
-                    st.experimental_rerun()
+                    st.rerun()
                 else:
                     st.sidebar.error("❌ Invalid service account file. Please try again.")
         else:
@@ -406,7 +411,7 @@ def main():
             if st.sidebar.button("Remove Service Account"):
                 if remove_service_account(user_id):
                     st.sidebar.success("Service account removed successfully!")
-                    st.experimental_rerun()
+                    st.rerun()
                 else:
                     st.sidebar.error("Failed to remove service account.")
 
